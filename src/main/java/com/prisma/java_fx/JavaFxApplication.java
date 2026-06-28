@@ -1,14 +1,11 @@
 package com.prisma.java_fx;
 
-import java.sql.ResultSet;
 import db.DB;
-import db.DbException;
+import db.exceptions.DbIntegrityException;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.sql.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Scanner;
 
 @SpringBootApplication
@@ -98,7 +95,35 @@ public class JavaFxApplication {
 //		}
 
 
-		// Realizando o fluxo de Update do fluxo de ETL
+//		 Realizando o fluxo de Update do fluxo de ETL
+//		Connection conn3 = null;
+//		PreparedStatement statement2 = null;
+//		Scanner sc = new Scanner(System.in);
+//
+//		try{
+//
+//			conn3 = DB.getConnection();
+//			statement2 = conn3.prepareStatement("UPDATE seller "
+//													+ "SET BaseSalary = BaseSalary + ? "
+//													+ "WHERE "
+//													+ "(DepartmentId = ?)");
+//
+//			statement2.setDouble(1, sc.nextDouble());
+//			statement2.setInt(2, sc.nextInt());
+//
+//			int informateAffectorRowsTwo = statement2.executeUpdate();
+//			System.out.println("Done! " + informateAffectorRowsTwo);
+//
+//		} catch (SQLException e)
+//		{
+//			e.printStackTrace();
+//		}
+//		finally {
+//			DB.closeStatement(statement2);
+//			DB.closeConnection(conn3);
+//		}
+
+//		Realizando o fluxo de Deleção com ETL + Criação de exceção personalizada
 		Connection conn3 = null;
 		PreparedStatement statement2 = null;
 		Scanner sc = new Scanner(System.in);
@@ -106,20 +131,22 @@ public class JavaFxApplication {
 		try{
 
 			conn3 = DB.getConnection();
-			statement2 = conn3.prepareStatement("UPDATE seller "
-													+ "SET BaseSalary = BaseSalary + ? "
-													+ "WHERE "
-													+ "(DepartmentId = ?)");
+			statement2 = conn3.prepareStatement("DELETE FROM DepartmentId "
+													+ "	WHERE) "
+													+ "Id = ? ");
 
-			statement2.setDouble(1, sc.nextDouble());
-			statement2.setInt(2, sc.nextInt());
+
+
+
+			statement2.setInt(1, sc.nextInt());
+			sc.nextLine();
 
 			int informateAffectorRowsTwo = statement2.executeUpdate();
 			System.out.println("Done! " + informateAffectorRowsTwo);
 
 		} catch (SQLException e)
 		{
-			e.printStackTrace();
+			throw new DbIntegrityException(e.getMessage());
 		}
 		finally {
 			DB.closeStatement(statement2);

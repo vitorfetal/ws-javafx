@@ -1,6 +1,6 @@
 package db;
 
-import org.hibernate.annotations.processing.SQL;
+import db.exceptions.DbException;
 
 import java.sql.*;
 
