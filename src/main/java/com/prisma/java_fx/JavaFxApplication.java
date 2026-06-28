@@ -1,6 +1,8 @@
 package com.prisma.java_fx;
 
 import db.DB;
+import db.exceptions.DbException;
+import db.exceptions.DbFakeError;
 import db.exceptions.DbIntegrityException;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -124,34 +126,81 @@ public class JavaFxApplication {
 //		}
 
 //		Realizando o fluxo de Deleção com ETL + Criação de exceção personalizada
-		Connection conn3 = null;
-		PreparedStatement statement2 = null;
+//		Connection conn3 = null;
+//		PreparedStatement statement2 = null;
 		Scanner sc = new Scanner(System.in);
+//
+//		try{
+//
+//			conn3 = DB.getConnection();
+//			statement2 = conn3.prepareStatement("DELETE FROM DepartmentId "
+//													+ "	WHERE) "
+//													+ "Id = ? ");
+//
+//
+//
+//
+//			statement2.setInt(1, sc.nextInt());
+//			sc.nextLine();
+//
+//			int informateAffectorRowsTwo = statement2.executeUpdate();
+//			System.out.println("Done! " + informateAffectorRowsTwo);
+//
+//		} catch (SQLException e)
+//		{
+//			throw new DbIntegrityException(e.getMessage());
+//		}
+//		finally {
+//			DB.closeStatement(statement2);
+//			DB.closeConnection(conn3);
+//		}
 
-		try{
+		Connection conn = null;
+		Statement statement = null;
 
-			conn3 = DB.getConnection();
-			statement2 = conn3.prepareStatement("DELETE FROM DepartmentId "
-													+ "	WHERE) "
-													+ "Id = ? ");
+		try {
 
+			conn = DB.getConnection();
 
+			conn.setAutoCommit(false); //Em caso de erro, não haverá confirmação de transação automatica = false
 
+			statement = conn.createStatement();
 
-			statement2.setInt(1, sc.nextInt());
-			sc.nextLine();
+			int rows1 = statement.executeUpdate("UPDATE seller SET BaseSalary = 3000 WHERE DepartmentId = 2 ");
 
-			int informateAffectorRowsTwo = statement2.executeUpdate();
-			System.out.println("Done! " + informateAffectorRowsTwo);
+			int x = 1;
+			if (x < 2)
+			{
+
+			throw  new DbFakeError("Erro fake");
+
+			}
+
+			int rows2 = statement.executeUpdate("UPDATE seller SET BaseSalary = BaseSalary + 3000 WHERE DepartmentId = 3 ");
+
+			conn.commit(); //Caso não ocorra erro, será feito o processo de confirmação da transação
 
 		} catch (SQLException e)
 		{
-			throw new DbIntegrityException(e.getMessage());
+			try{
+				conn.rollback(); //Em caso de erro, ocorrerá o tratamento para retorno do estado antigo de transação (ACID)
+
+				throw new DbException("Transection rolled back! Caused by: " + e.getMessage());
+
+			} catch (SQLException e1)
+			{
+				throw  new DbException("Error trying to rolback! Caused by: " + e.getMessage());
+			}
+
+			throw new SQLException(e.getMessage());
+
 		}
+
 		finally {
-			DB.closeStatement(statement2);
-			DB.closeConnection(conn3);
+			DB.closeStatement(statement);
+			DB.closeConnection(conn);
 		}
+
     }
 
 }
