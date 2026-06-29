@@ -189,12 +189,10 @@ public class JavaFxApplication {
 
 			} catch (SQLException e1)
 			{
-				throw  new DbException("Error trying to rolback! Caused by: " + e.getMessage());
+				throw  new DbException("Error trying to rolback! Caused by: " + e1.getMessage());
 			}
 
-			throw new SQLException(e.getMessage());
-
-		}
+        }
 
 		finally {
 			DB.closeStatement(statement);
