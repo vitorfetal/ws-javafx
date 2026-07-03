@@ -1,8 +1,14 @@
 package com.prisma.java_fx.model.entities.impl;
 
+import com.prisma.java_fx.model.entities.Department;
 import com.prisma.java_fx.model.entities.Seller;
 import com.prisma.java_fx.model.entities.dao.SellerDao;
+import db.DB;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 public class SellerDaoJDBC implements SellerDao
@@ -27,8 +33,46 @@ public class SellerDaoJDBC implements SellerDao
     }
 
     @Override
-    public Seller findById(Integer id) {
-        return null;
+    public Seller findById(Integer id) throws SQLException {
+        Connection conn = DB.getConnection();
+        ResultSet rs = null;
+
+        try {
+            PreparedStatement st = conn.prepareStatement(
+                    "SELECT seller.*, department.Name as DepName"
+                        + "FROM seller INNER JOIN department"
+                        + "ON seller.DepartmentId = department.id"
+                        + "WHERE seller.Id = ?");
+
+            st.setInt(1, id);
+            rs = st.executeQuery();
+
+            if (rs.next())
+            {
+                Department dep = new Department();
+                dep.setId(rs.getInt("DepartmentId"));
+                dep.setName(rs.getString("Name"));
+                Seller seller = new Seller();
+                seller.setId(rs.getInt("Id"));
+                seller.setName(rs.getString("Name"));
+                seller.setBaseSalary(rs.getDouble("BaseSalary"));
+                seller.setEmail(rs.getString("Email"));
+                seller.setBirthDate(rs.getDate("BirthDate"));
+                seller.setDepartment(dep);
+            }
+            else{
+                return null;
+            }
+
+
+        }
+        catch (SQLException e)
+        {
+            throw new SQLException(e.getMessage());
+        }
+
+
+
     }
 
     @Override

@@ -6,16 +6,18 @@ import java.sql.*;
 
 public class DB
 {
+
+    //Criando os atributos de conexão
     private static final String URL = "jdbc:mysql://localhost:3306/coursejdbc";
 
     private static final String USER = "root";
     private static final String PASSWORD = "0852";
 
-    public static Connection getConnection()
+    public static Connection getConnection() //Criação da conexão com a classe DriverManager
         {
             try {
 
-                return DriverManager.getConnection(
+                return DriverManager.getConnection( //Atribuição dos parametros de conexão
                         URL,
                         USER,
                         PASSWORD

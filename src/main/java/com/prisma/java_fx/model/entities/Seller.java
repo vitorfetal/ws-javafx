@@ -29,8 +29,8 @@ public class Seller implements Serializable
         this.department = department;
     }
 
-    public Integer getId() {
-        return id;
+    public Integer getId(int id) {
+        return this.id;
     }
 
     public void setId(Integer id) {
