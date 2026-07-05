@@ -5,6 +5,7 @@ import com.prisma.java_fx.model.entities.Seller;
 import com.prisma.java_fx.model.entities.dao.SellerDao;
 import db.DB;
 import org.hibernate.annotations.processing.SQL;
+import org.hibernate.id.CompositeNestedGeneratedValueGenerator;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -92,8 +93,43 @@ public class SellerDaoJDBC implements SellerDao
     }
 
     @Override
-    public List<Seller> findAll() {
-        return List.of();
+    public List<Seller> findAll() throws SQLException {
+        Connection conn = DB.getConnection();
+        ResultSet rs = null;
+
+        PreparedStatement st = null;
+        try {
+            st = conn.prepareStatement(
+                    "SELECT seller.*,department.Name as DepName " +
+                            "FROM seller INNER JOIN department " +
+                            "ON seller.DepartmentId = department.Id " +
+                            "ORDER BY Name ");
+
+            rs = st.executeQuery();
+
+            List<Seller> sellers = new ArrayList<>();
+            Map<Integer, Department> map = new HashMap<>();
+
+            while (rs.next()) {
+
+                Department dep = map.get(rs.getInt("DepartmentId")); //Validação da existencia do Department pore ID
+
+                if (dep == null){dep = instanceDepartment(rs);}
+
+                Seller seller = instanceSeller(rs, dep);
+
+                sellers.add(seller);
+
+            }
+
+
+            return sellers;
+        } catch (SQLException e) {
+            throw new SQLException(e.getMessage());
+        } finally {
+            DB.closeStatement(st);
+            DB.closeResultSet(rs);
+        }
     }
 
     @Override
