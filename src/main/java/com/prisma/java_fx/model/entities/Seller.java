@@ -29,7 +29,7 @@ public class Seller implements Serializable
         this.department = department;
     }
 
-    public Integer getId(int id) {
+    public Integer getId() {
         return this.id;
     }
 
